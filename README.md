@@ -66,10 +66,36 @@ a score along the way.
 ## 🧪 Test Results
 
 ```
-$ python -m pytest -q
-.........                                                                [100%]
-9 passed in 0.05s
+$ python -m pytest -v
+============================= test session starts =============================
+platform win32 -- Python 3.14.4, pytest-9.0.3, pluggy-1.6.0
+collected 14 items
+
+tests/test_game_logic.py::test_winning_guess PASSED                      [  7%]
+tests/test_game_logic.py::test_guess_too_high PASSED                     [ 14%]
+tests/test_game_logic.py::test_guess_too_low PASSED                      [ 21%]
+tests/test_game_logic.py::test_too_high_says_go_lower PASSED             [ 28%]
+tests/test_game_logic.py::test_too_low_says_go_higher PASSED             [ 35%]
+tests/test_game_logic.py::test_range_per_difficulty PASSED               [ 42%]
+tests/test_game_logic.py::test_win_score_has_no_off_by_one PASSED        [ 50%]
+tests/test_game_logic.py::test_wrong_guess_never_rewards PASSED          [ 57%]
+tests/test_game_logic.py::test_parse_guess_rejects_non_numbers PASSED    [ 64%]
+tests/test_game_logic.py::test_decimal_input_is_truncated PASSED         [ 71%]
+tests/test_game_logic.py::test_extremely_large_value_does_not_crash PASSED [ 78%]
+tests/test_game_logic.py::test_negative_guess_is_out_of_range PASSED     [ 85%]
+tests/test_game_logic.py::test_guess_above_range_is_rejected PASSED      [ 92%]
+tests/test_game_logic.py::test_in_range_guess_still_accepted PASSED      [100%]
+
+============================= 14 passed in 0.17s ==============================
 ```
+
+### Edge cases covered (Challenge 1)
+
+| Edge case | Why it matters | Handling |
+|-----------|----------------|----------|
+| Decimal (`3.7`) | Users may type fractions | Truncated to an int (`3`) |
+| Extremely large (`1.0e999`) | Becomes infinity → used to crash with `OverflowError` | Caught and rejected with a friendly message |
+| Negative / out-of-range (`-5`, `200`) | Outside the valid 1–N range | Rejected with "Guess must be between low and high" |
 
 ## 🚀 Stretch Features
 

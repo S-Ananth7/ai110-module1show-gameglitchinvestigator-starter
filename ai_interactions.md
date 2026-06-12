@@ -26,11 +26,22 @@
 
 > Document how you used AI to help generate or improve tests.
 
+**Prompt used:**
+
+```
+Probe parse_guess() with unusual inputs (negatives, decimals, very large
+values, whitespace, scientific notation) and tell me which ones crash or
+behave incorrectly. Then generate pytest cases that verify the game handles
+each edge case gracefully instead of raising an exception.
+```
+
 | Edge Case | Prompt Used | AI-Suggested Test | Did It Pass? | Your Reasoning |
 |-----------|-------------|-------------------|--------------|----------------|
-| | | | | |
-| | | | | |
-| | | | | |
+| Decimal `3.7` | (above) | `test_decimal_input_is_truncated` | ✅ | Users naturally type fractions; the parser should truncate to an int, not error. |
+| Extremely large `1.0e999` | (above) | `test_extremely_large_value_does_not_crash` | ✅ | `float("1.0e999")` is infinity, and `int(infinity)` raised `OverflowError` — a real crash we found and fixed. |
+| Negative / out-of-range `-5`, `200` | (above) | `test_negative_guess_is_out_of_range`, `test_guess_above_range_is_rejected` | ✅ | A guess outside the difficulty's range is impossible to win with; it should be rejected with a clear message instead of silently accepted. |
+
+**What the probing revealed:** `1.0e999` crashed with `OverflowError` because, during the refactor, the exception handler had been narrowed from `except Exception` to `except ValueError`. Fix: catch `(ValueError, OverflowError)`, and add an optional range check (`low`/`high`) so out-of-range guesses fail gracefully.
 
 ---
 

@@ -45,3 +45,44 @@ def test_parse_guess_rejects_non_numbers():
     assert ok is False
     assert value is None
     assert error
+
+
+# ----------------------------------------------------------------------
+# Challenge 1: Advanced edge-case tests
+# Each verifies the game handles an unusual input gracefully (no crash).
+# ----------------------------------------------------------------------
+
+def test_decimal_input_is_truncated():
+    # Edge case: decimals. "3.7" should become the int 3, not crash.
+    ok, value, error = parse_guess("3.7")
+    assert ok is True
+    assert value == 3
+    assert error is None
+
+def test_extremely_large_value_does_not_crash():
+    # Edge case: huge scientific-notation value. float("1.0e999") is infinity,
+    # which used to crash with OverflowError when converted to int.
+    ok, value, error = parse_guess("1.0e999")
+    assert ok is False
+    assert value is None
+    assert error  # a friendly message, not an exception
+
+def test_negative_guess_is_out_of_range():
+    # Edge case: negative number. With a range given, -5 is rejected gracefully.
+    ok, value, error = parse_guess("-5", low=1, high=100)
+    assert ok is False
+    assert value is None
+    assert "between 1 and 100" in error
+
+def test_guess_above_range_is_rejected():
+    # Edge case: a number larger than the allowed maximum.
+    ok, value, error = parse_guess("200", low=1, high=100)
+    assert ok is False
+    assert "between 1 and 100" in error
+
+def test_in_range_guess_still_accepted():
+    # Sanity: a normal guess inside the range still passes.
+    ok, value, error = parse_guess("42", low=1, high=100)
+    assert ok is True
+    assert value == 42
+    assert error is None
